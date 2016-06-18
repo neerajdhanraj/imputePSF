@@ -1,0 +1,14 @@
+Package: imputePSF
+Type: Package
+Title: Impute Missing Data in Time Series Data with PSF Based Method
+Version: 0.1.0
+Author: Neeraj Bokde
+Maintainer: Neeraj Bokde <neerajdhanraj@gmail.com>
+Description: Imputes the missing values in time series data with PSF algorithm based approach.
+    The details about PSF algorithm are available at:
+    <https://cran.r-project.org/package=PSF>.
+License: GPL
+Imports:
+    PSF, graphics, stats
+LazyData: TRUE
+RoxygenNote: 5.0.1
