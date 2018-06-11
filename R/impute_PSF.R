@@ -1,7 +1,7 @@
 #' Function to find missing values in time series data and to impute these missing values
 #'
-#' @param dataIn as inpute time series data with missing values
-#' @return returns the time series data with imputed values
+#' @param dataIn as inpute time series with missing values
+#' @return returns the time series with imputed values
 #' @export
 #' @examples
 #' # d <- c(1:5,1:5,1:5,1:5,NA,NA,NA,NA,NA,1:5,1:5,1:5,1:5,NA,NA,NA,NA,NA,1:5,1:5,1:5,1:5)

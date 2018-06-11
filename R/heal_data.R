@@ -17,11 +17,7 @@ heal_data <- function(dataIn, patch)
   blue <- NULL
   patch1 <- patch
   ###dataIn[is.na(dataIn)] <- 0
-  #if(!(is.vector(dataIn)))
-  #{
-  #  dataIn <- dataIn[,1]
-  #}
-  #datax <- dataIn
+
   len <- length(dataIn)
   dataIn <- as.numeric(na.omit(dataIn))
   length(dataIn)
@@ -41,66 +37,62 @@ heal_data <- function(dataIn, patch)
       f_last <- f_last[, 1]
     }
 
-    nextVal <- patch[max_val_patch,][3]
-    if(!is.vector(nextVal))
+    n.ahead <- patch[max_val_patch,][3]
+    if(!is.vector(n.ahead))
     {
-      nextVal <- nextVal[, 1]
+      n.ahead <- n.ahead[, 1]
     }
 
     f_mid <- (f_first + f_last)/2
 
     lens <- length(dataIn)
 
-    if(f_first < 0.3*lens)
-    #if(f_mid <= (len/3))
+    if(f_first < 0.2*lens)
+    ###if(f_mid <= 0.5*lens)
     {
       dataIn <- as.numeric(na.omit(dataIn))
       dataIn1 <- rev(dataIn)
       len1 <- length(dataIn1)
       f_first_rev <- len1 - f_last
-      kOpt <- optimum_k(dataIn1[1:(f_first_rev)])
-      wOpt <- optimum_w(dataIn1[1:(f_first_rev)], 1)$Optimum_W
-      x2 <- pred_for_w(dataIn1[1:(f_first_rev)], wOpt, kOpt, nextVal)
+      x2 <- lpsf(data = dataIn1[1:(f_first_rev)], n.ahead = n.ahead)
       x3 <- rev(x2)
+      #for(h in 1:n.ahead)
+      #{
+      #  dataIn1[f_first_rev + h] <- NA
+      #}
+      #x2 <- na.interpolation(dataIn1[1:(f_first_rev + n.ahead)])
+      #x2 <- x2[(f_first_rev+1):(f_first_rev + n.ahead)]
+      #x3 <- rev(x2)
     }
 
-    if((f_first >=  0.3*lens) && (f_last <= 0.7*lens))
-    #if((f_mid > (len/3)) && (f_mid < (2*len/3)))
+    if((f_first >=  0.2*lens) && (f_last <= 0.8*lens))
+    ###if((f_mid >=  0.1*lens) && (f_mid <= 0.9*lens))
     {
-      #x1 <- AUTO_PSF(dataIn[1:f_first-1],nextVal)$Predicted_Values
       dataIn <- as.numeric(na.omit(dataIn))
-      kOpt <- optimum_k(dataIn[1:(f_first-1)])
-      wOpt <- optimum_w(dataIn[1:(f_first-1)], 1)$Optimum_W
-      x1 <- pred_for_w(dataIn[1:(f_first-1)], wOpt, kOpt, nextVal)
+      x1 <- lpsf(data = dataIn[1:(f_first-1)], n.ahead = n.ahead)
 
       dataIn1 <- rev(dataIn)
       dataIn1 <- as.numeric(na.omit(dataIn1))
-      #x2 <- AUTO_PSF(dataIn1[1:f_first-1],nextVal)$Predicted_Values
       len1 <- length(dataIn1)
       f_first_rev <- len1 - f_last
-      kOpt <- optimum_k(dataIn1[1:(f_first_rev)])
-      wOpt <- optimum_w(dataIn1[1:(f_first_rev)], 1)$Optimum_W
-      x2 <- pred_for_w(dataIn1[1:(f_first_rev)], wOpt, kOpt, nextVal)
+      x2 <- lpsf(data = dataIn1[1:(f_first_rev)], n.ahead = n.ahead)
       x2 <- rev(x2)
-
       x3 <- (x1+x2)/2
-
     }
 
-    if(f_last > 0.7*lens)
-    #if(f_mid >= (2*len/3))
+    if(f_last > 0.8*lens)
+    #if(f_mid > 0.5*lens)
     {
       dataIn <- as.numeric(na.omit(dataIn))
-      kOpt <- optimum_k(dataIn[1:(f_first-1)])
-      wOpt <- optimum_w(dataIn[1:(f_first-1)], 1)$Optimum_W
-      x3 <- pred_for_w(dataIn[1:(f_first-1)], wOpt, kOpt, nextVal)
+      x3 <- lpsf(data = dataIn[1:(f_first-1)], n.ahead = n.ahead)
+      #for(h in 1:n.ahead)
+      #{
+      #  dataIn1[f_first + h] <- NA
+      #}
+      #x2 <- na.interpolation(dataIn1[1:(f_first + n.ahead)])
+      #x3 <- x2[(f_first+1):(f_first + n.ahead)]
     }
   j <- 1
-    ###for(i in f_first:f_last)
-    ###{
-      ###datax[i] <- x3[j]
-      ###j <- j + 1
-    ###}
 
     datax <- insert_patch(datax, (f_first - 1), x3)
 
@@ -108,7 +100,7 @@ heal_data <- function(dataIn, patch)
     blue <- append(blue,f_first)
     blue <- append(blue,f_last)
     limit1 <- length(dataIn)
-    plot(dataIn[1:f_first],type = "o", xlim = c(0,length(dataIn)),col=c("red"), xlab = "Time Series Data", ylab=NA)
+    plot(dataIn[1:f_first],type = "o", xlim = c(0,length(dataIn)),ylim = c(min(dataIn), max(dataIn)), col=c("red"), xlab = "Time Series Data", ylab=NA)
     points(f_first:f_last+1, dataIn[f_first:f_last+1],col="blue", type ="o",pch=22)
     points(f_last+1:limit1,dataIn[f_last+1:limit1],col="red", type ="o")
     patch <- patch[-which.max(patch$z),]
@@ -118,7 +110,7 @@ heal_data <- function(dataIn, patch)
   }
   blue <- sort(blue)
   blue <- append(blue, length(dataIn))
-  plot(dataIn[1:blue[1]],type = "o", xlim = c(0,length(dataIn)),col=c("red"), xlab = "Time Series Data", ylab=NA)
+  plot(dataIn[1:blue[1]],type = "o", xlim = c(0,length(dataIn)),ylim = c(min(dataIn), max(dataIn)),col=c("red"), xlab = "Time Series Data", ylab=NA)
   i=1
   #for(j in 1:length(blue)-2)
 

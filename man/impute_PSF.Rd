@@ -7,10 +7,10 @@
 impute_PSF(dataIn)
 }
 \arguments{
-\item{dataIn}{as inpute time series data with missing values}
+\item{dataIn}{as inpute time series with missing values}
 }
 \value{
-returns the time series data with imputed values
+returns the time series with imputed values
 }
 \description{
 Function to find missing values in time series data and to impute these missing values
